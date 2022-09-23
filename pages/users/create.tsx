@@ -12,13 +12,13 @@ import {
   Form,
   Label,
   Main,
-  Input
-} from './../components';
+  Input,
+} from './../../components';
 
 import {
   useAlert,
   useUsersOperations
-} from './../hooks';
+} from './../../hooks';
 
 const Home: NextPage = () => {
   const theme = 'dark';
@@ -29,17 +29,18 @@ const Home: NextPage = () => {
   const router = useRouter();
   const usersOp = useUsersOperations();
 
+  const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  async function handleLogin() {
-    if (!!email || !!password) {
-      const login = await usersOp.signIn(email, password); 
+  async function handleCreate() {
+    if (!!name || !!email || !!password) {
+      const create = await usersOp.signUP(name, email, password); 
       
-      if (login) {
-        alert.notify('Login realizado com sucesso!', 'success');
+      if (create) {
+        alert.notify('Usuário criado com sucesso!', 'success');
       } else {
-        alert.notify('Erro ao realizar login, por favor, verifique as informações e tente novamente!', 'error');
+        alert.notify('Erro ao criar usuário, por favor, verifique as informações e tente novamente!', 'error');
       }
     } else {
       alert.notify('Preencha todos os campos!', 'error');
@@ -49,7 +50,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Login</title>
+        <title>CRIAR CONTA</title>
         <meta name="description" content="SVA TECH" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -77,12 +78,20 @@ const Home: NextPage = () => {
           <Form
             onSubmit={(e) => {
               e.preventDefault();
-              handleLogin();
+              handleCreate();
             }}
           >
             <h2 className='font-serif self-start text-2xl mb-1'>Bem vindo!</h2>
-            <p className='font-serif self-start text-base mb-5'>Prazer em vê-lo, como está hoje?</p>
+            <p className='font-serif self-start text-base mb-5'>Como gostaria de se indentificar?</p>
           
+            <Input 
+              type='text' 
+              placeholder='Nome' 
+              className='mb-2.5'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+
             <Input 
               type='text' 
               placeholder='Email' 
@@ -99,11 +108,11 @@ const Home: NextPage = () => {
               onChange={(e) => setPassword(e.target.value)}
             /> 
 
-            <Button>ENTRAR</Button>
+            <Button>Criar conta</Button>
             <Label 
               className='mt-3 w-fit self-center'
-              onClick={() => router.push('/users/create')}
-            >Você ainda não tem uma conta? Crie uma!</Label>
+              onClick={() => router.push('/')}
+            >Já tem uma conta? Faça login!</Label>
           </Form>
         </div>
       </Main>
