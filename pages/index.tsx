@@ -38,6 +38,7 @@ const Home: NextPage = () => {
       
       if (login) {
         alert.notify('Login realizado com sucesso!', 'success');
+        router.push('/content');
       } else {
         alert.notify('Erro ao realizar login, por favor, verifique as informações e tente novamente!', 'error');
       }
@@ -86,7 +87,8 @@ const Home: NextPage = () => {
             <Input 
               type='text' 
               placeholder='Email' 
-              belowLabelLeft='Nunca compartilhe seu email!' 
+              belowLabelLeft='Nunca compartilhe seu email!'
+              aria-describedby='email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             /> 
@@ -94,6 +96,7 @@ const Home: NextPage = () => {
             <Input 
               type='password' 
               placeholder='Senha' 
+              aria-describedby='password'
               className='mb-2.5' 
               value={password}
               onChange={(e) => setPassword(e.target.value)}

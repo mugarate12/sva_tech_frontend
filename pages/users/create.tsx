@@ -39,6 +39,7 @@ const Home: NextPage = () => {
       
       if (create) {
         alert.notify('Usuário criado com sucesso!', 'success');
+        router.push('/users');
       } else {
         alert.notify('Erro ao criar usuário, por favor, verifique as informações e tente novamente!', 'error');
       }
@@ -88,6 +89,7 @@ const Home: NextPage = () => {
               type='text' 
               placeholder='Nome' 
               className='mb-2.5'
+              aria-describedby='name'
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -95,6 +97,7 @@ const Home: NextPage = () => {
             <Input 
               type='text' 
               placeholder='Email' 
+              aria-describedby='email'
               belowLabelLeft='Nunca compartilhe seu email!' 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -103,6 +106,7 @@ const Home: NextPage = () => {
             <Input 
               type='password' 
               placeholder='Senha' 
+              aria-describedby='password'
               className='mb-2.5' 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
