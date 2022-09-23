@@ -24,4 +24,7 @@ export interface Word {
   sourceUrls: Array<string>;
 };
 
-export type WordData = Array<Word>;
+export type WordData = {
+  isFavorite: boolean;
+  data: Array<Word>;
+};

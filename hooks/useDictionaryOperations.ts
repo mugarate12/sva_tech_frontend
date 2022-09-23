@@ -23,7 +23,45 @@ export default function useDictionaryOperations() {
       });
   }
 
+  async function favoriteWord(word: string) {
+    return await api.post<{
+      message: string;
+    }>(`/entries/en/${word}/favorite`, {}, {
+      headers: {
+        'Authorization': String(userServices.getToken())
+      }
+    })
+      .then(response => {
+        alert.notify(response.data.message, 'success');
+        return true;
+      })
+      .catch(error => {
+        alert.notify(error.response.data.message, 'error');
+        return false;
+      });
+  }
+
+  async function unfavoriteWord(word: string) {
+    return await api.delete<{
+      message: string;
+    }>(`/entries/en/${word}/unfavorite`, {
+      headers: {
+        'Authorization': String(userServices.getToken())
+      }
+    })
+      .then(response => {
+        alert.notify(response.data.message, 'success');
+        return true;
+      })
+      .catch(error => {
+        alert.notify(error.response.data.message, 'error');
+        return false;
+      });
+  }
+
   return {
-    getWord
+    getWord,
+    favoriteWord,
+    unfavoriteWord
   }
 }

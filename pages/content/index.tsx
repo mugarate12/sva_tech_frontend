@@ -31,6 +31,18 @@ const Content: NextPage = () => {
     setWord(response);
   }
 
+  async function handleFavoriteWord(word: Dictionary.WordData | undefined) {
+    if (word && word.data.length > 0) {
+      if (word.isFavorite) {
+        const request = await dictionaryOp.unfavoriteWord(word.data[0].word);
+        if (request) await handleSelectWord(word.data[0].word);
+      } else {
+        const request = await dictionaryOp.favoriteWord(word.data[0].word);
+        if (request) await handleSelectWord(word.data[0].word);
+      }
+    }
+  }
+
   useEffect(() => {
     handleSelectWord('hello');
   }, []);
@@ -44,7 +56,7 @@ const Content: NextPage = () => {
       </Head>
 
       <Main className='pt-4 flex flex-1 flex-col items-center'>
-        <WordDescription word={word} />
+        <WordDescription word={word} onFavoriteWord={() => handleFavoriteWord(word)} />
       </Main>
     </>
   )

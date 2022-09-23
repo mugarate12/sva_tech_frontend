@@ -17,6 +17,7 @@ import {
 
 interface Props {
   word?: Dictionary.WordData;
+  onFavoriteWord?: Function;
 }
 
 interface Meanings {
@@ -26,7 +27,8 @@ interface Meanings {
 }
 
 const WordDescription = ({
-  word
+  word,
+  onFavoriteWord
 }: Props) => {
   const [ wordTitle, setWordTitle ] = useState<string>('');
   const [ phoneticsText, setPhoneticsText ] = useState<string[]>([]);
@@ -34,12 +36,12 @@ const WordDescription = ({
   const [ meanings, setMeanings ] = useState<Meanings[]>([]);
 
   useEffect(() => {
-    if (word && word.length > 0) {
-      setWordTitle(word[0].word);
+    if (word && word.data.length > 0) {
+      setWordTitle(word.data[0].word);
 
       // set phonetics text
       let wordPhoneticsText: string[] = [];
-      word.forEach(wordItem => {
+      word.data.forEach(wordItem => {
         const pronetics = wordItem.phonetics;
         pronetics.forEach(pronetic => {
           if (pronetic.text) wordPhoneticsText.push(pronetic.text);
@@ -52,7 +54,7 @@ const WordDescription = ({
 
       // set meanings
       let meaningsText: Meanings[] = [];
-      word.forEach(wordItem => {
+      word.data.forEach(wordItem => {
         const meanings = wordItem.meanings;
         meanings.forEach(meaning => {
           let text = '';
@@ -87,12 +89,12 @@ const WordDescription = ({
       if (index === meanings.length - 1) includeMarginBotton = false;
 
       return (
-        <div className={`w-full flex flex-col ${includeMarginBotton ? 'mb-2' : ''}`}>
+        <div className={`w-full flex flex-col ${includeMarginBotton ? 'mb-2' : ''}`} key={`meaning_${index}`}>
           <p key={index} className='w-full font-serif text-sm text-start'>Definition: {meaning.text}</p>
           {meaning.antonyms ? <p className='w-full font-serif text-sm text-start'>Antonyms: {meaning.antonyms}</p> : null}
           {meaning.synonyms ? <p className='w-full font-serif text-sm text-start'>Synonyms: {meaning.synonyms}</p> : null}
         </div>
-      )
+      );
     })
   }
 
@@ -120,8 +122,12 @@ const WordDescription = ({
       </div>
 
       <div className='w-full flex flex-row justify-end items-center'>
-        <Button className='btn btn-circle btn-link' title='Adicionar favorito'>
-          <HeartIcon className="h-7 w-7 text-red-500"/>
+        <Button 
+          className='btn btn-circle btn-link' 
+          title='Adicionar favorito'
+          onClick={() => onFavoriteWord && onFavoriteWord(word)}
+        >
+          <HeartIcon className={`h-7 w-7 ${ !!word && word.isFavorite ? 'text-red-500' : 'text-black-500' }`}/>
         </Button>
       </div>
 
