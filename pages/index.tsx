@@ -5,6 +5,7 @@ import {
   useState
 } from 'react';
 import { useMedia } from 'use-media';
+import { useRouter } from 'next/router';
 
 import styles from '../styles/Home.module.css';
 
@@ -12,30 +13,39 @@ import {
   Main,
   Form,
   Input,
-  Button
+  Button,
+  Label
 } from './../components';
+
+import {
+  useAlert,
+  useUsersOperations
+} from './../hooks';
 
 const Home: NextPage = () => {
   const theme = 'dark';
   const cardTheme = 'black';
 
   const mediumScreen = useMedia({ maxWidth: 768 });
+  const alert = useAlert();
+  const router = useRouter();
+  const usersOp = useUsersOperations();
 
-  const [user, setUser] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
   async function handleLogin() {
-    // const login = await clientOP.login(user, password);
-
-    // if (Object.keys(login.data).includes('error')) {
-    //   if (login.data.error.message) alert.notify(login.data.error.message, 'error');
-    //   else alert.notify(login.data.message, 'error');
-    // } else {
-    //   alert.notify(login.data.message, 'success');
-
-
-    //   router.push('/clients/anomalias');
-    // }
+    if (!!email || !!password) {
+      const login = await usersOp.signIn(email, password); 
+      
+      if (login) {
+        alert.notify('Login realizado com sucesso!', 'success');
+      } else {
+        alert.notify('Erro ao realizar login, por favor, verifique as informações e tente novamente!', 'error');
+      }
+    } else {
+      alert.notify('Preencha todos os campos!', 'error');
+    }
   }
 
   return (
@@ -77,11 +87,10 @@ const Home: NextPage = () => {
           
             <Input 
               type='text' 
-              placeholder='Usuário' 
-              className='' 
-              belowLabelLeft='Nunca compartilhe seu usuário!' 
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
+              placeholder='Email' 
+              belowLabelLeft='Nunca compartilhe seu email!' 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             /> 
             
             <Input 
@@ -93,6 +102,10 @@ const Home: NextPage = () => {
             /> 
 
             <Button>ENTRAR</Button>
+            <Label 
+              className='mt-3 w-fit self-center'
+              onClick={() => router.push('/users/create')}
+            >Você ainda não tem uma conta? Crie uma!</Label>
           </Form>
         </div>
       </Main>
