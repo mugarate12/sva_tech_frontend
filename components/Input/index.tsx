@@ -45,9 +45,7 @@ const Input = ({
   return (
     <>
       {renderAboveLabel()}
-
       <input {...rest} className={`input input-bordered w-full max-w-xs input-sm ${className}`} />
-    
       {renderBellowLabel()}
     </>
   )

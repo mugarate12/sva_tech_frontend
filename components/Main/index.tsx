@@ -8,7 +8,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 const Main = ({ className, dataTheme, ...rest }: Props) => {
   return <main 
     { ...rest } 
-    className={`h-screen w-screen pl-[5px] md:pl-[50px] pt-[70px] md:pt-[5px] pr-[5px] ${className}`}
+    className={`h-screen w-screen ${className}`}
     data-theme={!!dataTheme ? dataTheme : 'dark'}
   ></main>
 }

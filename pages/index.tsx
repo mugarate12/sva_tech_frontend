@@ -39,7 +39,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <>
       <Head>
         <title>Login</title>
         <meta name="description" content="SVA TECH" />
@@ -72,15 +72,14 @@ const Home: NextPage = () => {
               handleLogin();
             }}
           >
-            <h2 className='font-serif self-start text-2xl mb-1' data-theme={theme}>Bem vindo!</h2>
-            <p className='font-serif self-start text-base mb-5' data-theme={theme}>Prazer em vê-lo, como está hoje?</p>
+            <h2 className='font-serif self-start text-2xl mb-1'>Bem vindo!</h2>
+            <p className='font-serif self-start text-base mb-5'>Prazer em vê-lo, como está hoje?</p>
           
             <Input 
               type='text' 
               placeholder='Usuário' 
               className='' 
               belowLabelLeft='Nunca compartilhe seu usuário!' 
-              data-theme={theme}
               value={user}
               onChange={(e) => setUser(e.target.value)}
             /> 
@@ -89,16 +88,15 @@ const Home: NextPage = () => {
               type='password' 
               placeholder='Senha' 
               className='mb-2.5' 
-              data-theme={theme}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             /> 
 
-            <Button data-theme={theme} >ENTRAR</Button>
+            <Button>ENTRAR</Button>
           </Form>
         </div>
       </Main>
-    </div>
+    </>
   )
 }
 
