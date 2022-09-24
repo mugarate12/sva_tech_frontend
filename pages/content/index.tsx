@@ -5,6 +5,7 @@ import {
   useEffect,
   useRef
 } from 'react';
+import { useMedia } from 'use-media';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import {
@@ -18,7 +19,7 @@ import { api } from './../../config';
 
 const Content: NextPage = () => {
   const dictionaryOp = useDictionaryOperations();
-  const loadMoreRef = useRef(null);
+  const mediumScreen = useMedia({ maxWidth: 768 });
 
   const [ word, setWord ] = useState<Dictionary.WordData | undefined>(undefined);
   const [ actualTab, setActualTab ] = useState<'word_list' | 'history' | 'favorites'>('word_list');
@@ -29,7 +30,7 @@ const Content: NextPage = () => {
 
   async function getInitialWords() {
     const words = await dictionaryOp.indexWords({
-      limit: 12
+      limit: 30
     });
     if (words) setWords(words);
     if (words) setWordsResults(words.results);
@@ -37,7 +38,7 @@ const Content: NextPage = () => {
 
   async function getInitialHistory() {
     const words = await dictionaryOp.indexFavorites({
-      limit: 12
+      limit: 30
     });
 
     if (words) setWords(words);
@@ -46,7 +47,7 @@ const Content: NextPage = () => {
   
   async function getInitialFavorites() {
     const words = await dictionaryOp.indexHistory({
-      limit: 12
+      limit: 30
     });
 
     if (words) setWords(words);
@@ -54,26 +55,28 @@ const Content: NextPage = () => {
   }
 
   async function getMoreWords() {
+    console.log('fui chamado ', words.next);
     if (words.next) {
       let newWords: Dictionary.IndexWord | undefined = undefined;
+      const limit = 30;
       
       if (actualTab === 'word_list') {
         newWords = await dictionaryOp.indexWords({
-          limit: 12,
+          limit: limit,
           cursor: words.next,
         });
       } else if (actualTab === 'history') {
         newWords = await dictionaryOp.indexHistory({
-          limit: 12,
+          limit: limit,
           cursor: words.next,
         });
       } else {
         newWords = await dictionaryOp.indexFavorites({
-          limit: 12,
+          limit: limit,
           cursor: words.next,
         });
       }
-      
+
       if (newWords) {
         setWords(newWords)
         setWordsResults(wordsResults.concat(newWords.results));
@@ -124,6 +127,10 @@ const Content: NextPage = () => {
     }
   }, [ actualTab ]);
 
+  useEffect(() => {
+    getInitialWords();
+  }, [ mediumScreen ]);
+
   function renderWords() {
     let wordsHeadquarters: Array<string[]> = [];
     let auxArray: string[] = [];
@@ -170,15 +177,18 @@ const Content: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Main className='pt-4 pb-6 flex flex-1 flex-col items-center'>
+      <Main className='pt-4 pb-6 
+        flex flex-1 flex-col items-center
+        md:flex-row md:gap-8 md:justify-center
+      '>
         <WordDescription
           className='w-80 mb-6' 
           word={word}
           onFavoriteWord={() => handleFavoriteWord(word)} 
         />
 
-        <div className='w-80 flex flex-col items-center'>
-          <div className="tabs mb-6">
+        <div className='max-h-[584px] w-80 flex flex-col items-center'>
+          <div className="tabs mb-6 md:mb-0">
             <a 
               className={`tab md:tab-lifted ${actualTab === 'word_list' ? 'tab-active' : ''}`}
               onClick={() => setActualTab('word_list')}
@@ -193,26 +203,54 @@ const Content: NextPage = () => {
             >Favorites</a>
           </div>
 
-          <h2 className='w-full m-0 mb-4 p-0 font-serif text-base text-start'>{formatInformationsTitle()}</h2>
+          <h2 className='md:hidden w-full m-0 mb-4 p-0 font-serif text-base text-start'>{formatInformationsTitle()}</h2>
 
-          <div className='max-h-[162px] w-full flex flex-col gap-4'>
+          <div className='w-full flex flex-col gap-4'>
             <InfiniteScroll
+                dataLength={wordsResults.length / 3} //This is important field to render the next data
+                next={getMoreWords}
+                hasMore={true}
+                height={mediumScreen ? 232 : 502}
+                loader={<p style={{ textAlign: 'center' }}>Carregando mais palavras...</p>}
+                endMessage={
+                  <p style={{ textAlign: 'center' }}>
+                    <b>Fim da lista</b>
+                  </p>
+                }
+              >
+                {renderWords()}
+              </InfiniteScroll>
+            {/* {mediumScreen ?
+              <InfiniteScroll
+                dataLength={wordsResults.length / 3} //This is important field to render the next data
+                next={getMoreWords}
+                hasMore={true}
+                loader={<p style={{ textAlign: 'center' }}>Carregando mais palavras...</p>}
+                endMessage={
+                  <p style={{ textAlign: 'center' }}>
+                    <b>Fim da lista</b>
+                  </p>
+                }
+              >
+                {renderWords()}
+              </InfiniteScroll> :
+              <InfiniteScroll
               dataLength={wordsResults.length / 3} //This is important field to render the next data
               next={getMoreWords}
               hasMore={true}
-              loader={<p>Carregando mais palavras...</p>}
+              height={502}
+              loader={<p style={{ textAlign: 'center' }}>Carregando mais palavras...</p>}
               endMessage={
                 <p style={{ textAlign: 'center' }}>
-                  <b>Yay! You have seen it all</b>
+                  <b>Fim da lista</b>
                 </p>
               }
             >
               {renderWords()}
             </InfiniteScroll>
-            {/* {words.next && <p ref={loadMoreRef}>Carregando mais palavras...</p>} */}
+            } */}
           </div>
         </div>
-
       </Main>
     </>
   )

@@ -103,7 +103,7 @@ const WordDescription = ({
 
   return (
     <div className={`h-fit w-80 flex flex-col gap-4 ${className}`}>
-      <div className='w-full flex flex-row items-center'>
+      <div className='md:hidden w-full flex flex-row items-center'>
         <Button 
           className='btn btn-circle btn-outline'
         >

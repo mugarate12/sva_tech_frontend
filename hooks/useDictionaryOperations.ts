@@ -14,6 +14,7 @@ export default function useDictionaryOperations() {
 
   async function indexWords({ search, cursor, limit }: indexInterface = {}) {
     let queryParams = {} as indexInterface;
+    console.log(limit);
 
     if (search) queryParams.search = search;
     if (cursor) queryParams.cursor = cursor;
