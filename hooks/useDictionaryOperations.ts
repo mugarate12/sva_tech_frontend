@@ -13,6 +13,9 @@ export default function useDictionaryOperations() {
   const alert = useAlert();
 
   async function indexWords({ search, cursor, limit }: indexInterface = {}) {
+    const token = userServices.getToken();
+    if (!token) return undefined;
+    
     let queryParams = {} as indexInterface;
 
     if (search) queryParams.search = search;
@@ -22,7 +25,7 @@ export default function useDictionaryOperations() {
     return await api.get<Dictionary.IndexWord>('/entries/en', {
       params: queryParams,
       headers: {
-        Authorization: String(userServices.getToken())
+        Authorization: token
       }
     })
       .then(response => response.data)
@@ -32,6 +35,9 @@ export default function useDictionaryOperations() {
   }
 
   async function indexHistory({ search, cursor, limit }: indexInterface = {}) {
+    const token = userServices.getToken();
+    if (!token) return undefined;
+    
     let queryParams = {} as indexInterface;
 
     if (search) queryParams.search = search;
@@ -41,7 +47,7 @@ export default function useDictionaryOperations() {
     return await api.get<Dictionary.IndexWord>('/user/me/history', {
       params: queryParams,
       headers: {
-        Authorization: String(userServices.getToken())
+        Authorization: token
       }
     })
       .then(response => response.data)
@@ -51,6 +57,9 @@ export default function useDictionaryOperations() {
   }
 
   async function indexFavorites({ search, cursor, limit }: indexInterface = {}) {
+    const token = userServices.getToken();
+    if (!token) return undefined;
+
     let queryParams = {} as indexInterface;
 
     if (search) queryParams.search = search;
@@ -60,7 +69,7 @@ export default function useDictionaryOperations() {
     return await api.get<Dictionary.IndexWord>('/user/me/favorites', {
       params: queryParams,
       headers: {
-        Authorization: String(userServices.getToken())
+        Authorization: token
       }
     })
       .then(response => response.data)
@@ -70,9 +79,12 @@ export default function useDictionaryOperations() {
   }
   
   async function getWord(word: string) {
+    const token = userServices.getToken();
+    if (!token) return undefined;
+
     return await api.get<Dictionary.WordData>(`/entries/en/${word}`, {
       headers: {
-        'Authorization': String(userServices.getToken())
+        'Authorization': token
       }
     })
       .then(response => {
@@ -86,11 +98,14 @@ export default function useDictionaryOperations() {
   }
 
   async function favoriteWord(word: string) {
+    const token = userServices.getToken();
+    if (!token) return undefined;
+
     return await api.post<{
       message: string;
     }>(`/entries/en/${word}/favorite`, {}, {
       headers: {
-        'Authorization': String(userServices.getToken())
+        'Authorization': token
       }
     })
       .then(response => {
@@ -104,11 +119,14 @@ export default function useDictionaryOperations() {
   }
 
   async function unfavoriteWord(word: string) {
+    const token = userServices.getToken();
+    if (!token) return undefined;
+
     return await api.delete<{
       message: string;
     }>(`/entries/en/${word}/unfavorite`, {
       headers: {
-        'Authorization': String(userServices.getToken())
+        'Authorization': token
       }
     })
       .then(response => {
