@@ -13,7 +13,7 @@ import {
   Main
 } from './../../components';
 import { WordDescription } from './../../containers';
-import { useDictionaryOperations } from './../../hooks';
+import { useAlert, useDictionaryOperations } from './../../hooks';
 import { Dictionary } from './../../interfaces';
 import { userServices } from './../../services';
 import { api } from './../../config';
@@ -26,6 +26,7 @@ interface Props {
 const Content: NextPage<Props> = ({ initialWord }) => {
   const dictionaryOp = useDictionaryOperations();
   const mediumScreen = useMedia({ maxWidth: 768 });
+  const alert = useAlert();
 
   const [ word, setWord ] = useState<Dictionary.WordData | undefined>({
     data: initialWord,
@@ -98,6 +99,10 @@ const Content: NextPage<Props> = ({ initialWord }) => {
   }
 
   async function handleFavoriteWord(word: Dictionary.WordData | undefined) {
+    if (!userServices.getToken()) {
+      alert.notify('Você precisa estar logado para favoritar uma palavra', 'warning');
+    }
+
     if (word && word.data.length > 0) {
       if (word.isFavorite) {
         const request = await dictionaryOp.unfavoriteWord(word.data[0].word);
