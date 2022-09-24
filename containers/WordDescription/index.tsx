@@ -18,6 +18,7 @@ import {
 interface Props {
   word?: Dictionary.WordData;
   onFavoriteWord?: Function;
+  className?: string;
 }
 
 interface Meanings {
@@ -28,7 +29,9 @@ interface Meanings {
 
 const WordDescription = ({
   word,
-  onFavoriteWord
+  onFavoriteWord,
+
+  className
 }: Props) => {
   const [ wordTitle, setWordTitle ] = useState<string>('');
   const [ phoneticsText, setPhoneticsText ] = useState<string[]>([]);
@@ -99,7 +102,7 @@ const WordDescription = ({
   }
 
   return (
-    <div className='h-fit w-80 flex flex-col gap-4'>
+    <div className={`h-fit w-80 flex flex-col gap-4 ${className}`}>
       <div className='w-full flex flex-row items-center'>
         <Button 
           className='btn btn-circle btn-outline'
@@ -113,7 +116,7 @@ const WordDescription = ({
         {phoneticsText.map((text, index) => (<p key={index} className='w-full font-serif text-sm text-center'>{text}</p>))}
       </div>
 
-      <audio src={audioSource} controls>
+      <audio src={audioSource} controls className='self-center'>
       </audio>
 
       <div className='w-full flex flex-col gap-0'>

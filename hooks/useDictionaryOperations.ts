@@ -1,11 +1,36 @@
 import { api } from './../config';
-
 import { useAlert } from './';
 import { userServices } from './../services';
 import { Dictionary } from './../interfaces';
 
+interface indexInterface {
+  limit?: number,
+  cursor?: string,
+  search?: string
+}
+
 export default function useDictionaryOperations() {
   const alert = useAlert();
+
+  async function indexWords({ search, cursor, limit }: indexInterface = {}) {
+    let queryParams = {} as indexInterface;
+
+    if (search) queryParams.search = search;
+    if (cursor) queryParams.cursor = cursor;
+    if (limit) queryParams.limit = limit;
+
+    return await api.get<Dictionary.IndexWord>('/entries/en', {
+      params: queryParams,
+      headers: {
+        Authorization: String(userServices.getToken())
+      }
+    })
+      .then(response => response.data)
+      .catch(error => {
+        alert.notify(error.response.data.message, 'error');
+        return undefined;
+      });
+  }
   
   async function getWord(word: string) {
     return await api.get<Dictionary.WordData>(`/entries/en/${word}`, {
@@ -60,6 +85,7 @@ export default function useDictionaryOperations() {
   }
 
   return {
+    indexWords,
     getWord,
     favoriteWord,
     unfavoriteWord
