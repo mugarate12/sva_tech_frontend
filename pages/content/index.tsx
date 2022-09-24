@@ -1,10 +1,11 @@
 import type { NextPage } from 'next';
-import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import {
   useState,
-  useEffect
+  useEffect,
+  useRef
 } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 import {
   Main
@@ -17,36 +18,73 @@ import { api } from './../../config';
 
 const Content: NextPage = () => {
   const dictionaryOp = useDictionaryOperations();
+  const loadMoreRef = useRef(null);
 
   const [ word, setWord ] = useState<Dictionary.WordData | undefined>(undefined);
   const [ actualTab, setActualTab ] = useState<'word_list' | 'history' | 'favorites'>('word_list');
   
   const [ words, setWords ] = useState<Dictionary.IndexWord>(Dictionary.indexWordDefaultState);
+  const [ wordsResults, setWordsResults ] = useState<string[]>([]);
+  const [ cursor, setCursor ] = useState<string | null>(null);  
 
   async function getInitialWords() {
     const words = await dictionaryOp.indexWords({
       limit: 12
     });
     if (words) setWords(words);
+    if (words) setWordsResults(words.results);
   }
 
   async function getInitialHistory() {
     const words = await dictionaryOp.indexFavorites({
       limit: 12
     });
+
     if (words) setWords(words);
+    if (words) setWordsResults(words.results);
   }
   
   async function getInitialFavorites() {
     const words = await dictionaryOp.indexHistory({
       limit: 12
     });
+
     if (words) setWords(words);
+    if (words) setWordsResults(words.results);
+  }
+
+  async function getMoreWords() {
+    if (words.next) {
+      let newWords: Dictionary.IndexWord | undefined = undefined;
+      
+      if (actualTab === 'word_list') {
+        newWords = await dictionaryOp.indexWords({
+          limit: 12,
+          cursor: words.next,
+        });
+      } else if (actualTab === 'history') {
+        newWords = await dictionaryOp.indexHistory({
+          limit: 12,
+          cursor: words.next,
+        });
+      } else {
+        newWords = await dictionaryOp.indexFavorites({
+          limit: 12,
+          cursor: words.next,
+        });
+      }
+      
+      if (newWords) {
+        setWords(newWords)
+        setWordsResults(wordsResults.concat(newWords.results));
+      }
+    }
   }
 
   async function handleSelectWord(word: string) {
     const response = await dictionaryOp.getWord(word);
     setWord(response);
+    if (response && window) window.scrollTo(0, 0);
   }
 
   async function handleFavoriteWord(word: Dictionary.WordData | undefined) {
@@ -90,8 +128,8 @@ const Content: NextPage = () => {
     let wordsHeadquarters: Array<string[]> = [];
     let auxArray: string[] = [];
 
-    for (let index = 0; index < words.results.length; index++) {
-      const word = words.results[index];
+    for (let index = 0; index < wordsResults.length; index++) {
+      const word = wordsResults[index];
       
       if ((index + 1) % 3 === 0) {
         auxArray.push(word);
@@ -100,7 +138,7 @@ const Content: NextPage = () => {
         continue;
       }
 
-      if (index === words.results.length - 1) {
+      if (index === wordsResults.length - 1) {
         auxArray.push(word);
         wordsHeadquarters.push(auxArray);
         continue;
@@ -111,7 +149,7 @@ const Content: NextPage = () => {
 
     return wordsHeadquarters.map((words, index) => {
       return (
-        <div key={index} className='grid grid-cols-3'>
+        <div key={index} className='grid grid-cols-3 gap-2 mb-2'>
           {words.map((word, index) => {
             return <span 
               key={index} 
@@ -157,42 +195,21 @@ const Content: NextPage = () => {
 
           <h2 className='w-full m-0 mb-4 p-0 font-serif text-base text-start'>{formatInformationsTitle()}</h2>
 
-          <div className='max-h-[162px] w-full flex flex-col gap-4 overflow-scroll'>
-            {renderWords()}
-            {/* <div className='grid grid-cols-3'>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>02</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>03</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>04</span>
-            </div>
-            <div className='grid grid-cols-3'>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>02</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>03</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>04</span>
-            </div>
-            
-            <div className='grid grid-cols-3'>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>02</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>03</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>04</span>
-            </div>
-
-            <div className='grid grid-cols-3'>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>02</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>03</span>
-              <span className='h-[50px] w-full btn text-center bg-black rounded'>04</span>
-            </div> */}
-            {/* <span className='h-[50px] w-full btn text-center bg-black rounded'>01</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>05</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>06</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>07</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>08</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>09</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>10</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>11</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>12</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>13</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>14</span>
-            <span className='h-[50px] w-full btn text-center bg-black rounded'>15</span> */}
+          <div className='max-h-[162px] w-full flex flex-col gap-4'>
+            <InfiniteScroll
+              dataLength={wordsResults.length / 3} //This is important field to render the next data
+              next={getMoreWords}
+              hasMore={true}
+              loader={<p>Carregando mais palavras...</p>}
+              endMessage={
+                <p style={{ textAlign: 'center' }}>
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }
+            >
+              {renderWords()}
+            </InfiniteScroll>
+            {/* {words.next && <p ref={loadMoreRef}>Carregando mais palavras...</p>} */}
           </div>
         </div>
 
