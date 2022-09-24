@@ -1,4 +1,5 @@
 import type { NextPage } from 'next';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import {
   useState,
@@ -16,12 +17,20 @@ import { useDictionaryOperations } from './../../hooks';
 import { Dictionary } from './../../interfaces';
 import { userServices } from './../../services';
 import { api } from './../../config';
+import UsersServices from '../../services/Users.services';
 
-const Content: NextPage = () => {
+interface Props {
+  initialWord: Array<Dictionary.Word>;
+}
+
+const Content: NextPage<Props> = ({ initialWord }) => {
   const dictionaryOp = useDictionaryOperations();
   const mediumScreen = useMedia({ maxWidth: 768 });
 
-  const [ word, setWord ] = useState<Dictionary.WordData | undefined>(undefined);
+  const [ word, setWord ] = useState<Dictionary.WordData | undefined>({
+    data: initialWord,
+    isFavorite: false
+  });
   const [ actualTab, setActualTab ] = useState<'word_list' | 'history' | 'favorites'>('word_list');
   
   const [ words, setWords ] = useState<Dictionary.IndexWord>(Dictionary.indexWordDefaultState);
@@ -166,24 +175,9 @@ const Content: NextPage = () => {
     });
   }
 
-  return (
-    <>
-      <Head>
-        <title>Bem vindo!</title>
-        <meta name="description" content="SVA TECH" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <Main className='pt-4 pb-6 
-        flex flex-1 flex-col items-center
-        md:flex-row md:gap-8 md:justify-center
-      '>
-        <WordDescription
-          className={`w-80 mb-6 ${!word ? 'hidden md:flex' : ''}`}
-          word={word}
-          onFavoriteWord={() => handleFavoriteWord(word)} 
-        />
-
+  function renderTab() {
+    if (wordsResults.length > 0) {
+      return (
         <div className='max-h-[584px] w-80 flex flex-col items-center'>
           <div className="tabs mb-6 md:mb-0">
             <a 
@@ -219,9 +213,49 @@ const Content: NextPage = () => {
             </InfiniteScroll>
           </div>
         </div>
+      )
+    }
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Bem vindo!</title>
+        <meta name="description" content="SVA TECH" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <Main className='pt-4 pb-6 
+        flex flex-1 flex-col items-center
+        md:flex-row md:gap-8 md:justify-center
+      '>
+        <WordDescription
+          className={`w-80 mb-6 ${!word ? 'hidden md:flex' : ''}`}
+          word={word}
+          onFavoriteWord={() => handleFavoriteWord(word)} 
+        />
+
+        
+        {renderTab()}
       </Main>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const search = ctx.query.word;
+
+  const word: Array<Dictionary.Word> | undefined = await api.get<Array<Dictionary.Word>>(`/proxy/${search}`)
+    .then(response => response.data)
+    .catch(error => {
+      return undefined;
+    });
+  
+  return {
+    props: {
+      initialWord: word
+    }
+  }
 }
 
 export default Content;

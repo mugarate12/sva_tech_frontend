@@ -14,7 +14,6 @@ export default function useDictionaryOperations() {
 
   async function indexWords({ search, cursor, limit }: indexInterface = {}) {
     let queryParams = {} as indexInterface;
-    console.log(limit);
 
     if (search) queryParams.search = search;
     if (cursor) queryParams.cursor = cursor;
@@ -28,7 +27,6 @@ export default function useDictionaryOperations() {
     })
       .then(response => response.data)
       .catch(error => {
-        alert.notify(error.response.data.message, 'error');
         return undefined;
       });
   }
@@ -48,7 +46,6 @@ export default function useDictionaryOperations() {
     })
       .then(response => response.data)
       .catch(error => {
-        alert.notify(error.response.data.message, 'error');
         return undefined;
       });
   }
@@ -68,7 +65,6 @@ export default function useDictionaryOperations() {
     })
       .then(response => response.data)
       .catch(error => {
-        alert.notify(error.response.data.message, 'error');
         return undefined;
       });
   }
