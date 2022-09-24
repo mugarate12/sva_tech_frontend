@@ -31,6 +31,46 @@ export default function useDictionaryOperations() {
         return undefined;
       });
   }
+
+  async function indexHistory({ search, cursor, limit }: indexInterface = {}) {
+    let queryParams = {} as indexInterface;
+
+    if (search) queryParams.search = search;
+    if (cursor) queryParams.cursor = cursor;
+    if (limit) queryParams.limit = limit;
+
+    return await api.get<Dictionary.IndexWord>('/user/me/history', {
+      params: queryParams,
+      headers: {
+        Authorization: String(userServices.getToken())
+      }
+    })
+      .then(response => response.data)
+      .catch(error => {
+        alert.notify(error.response.data.message, 'error');
+        return undefined;
+      });
+  }
+
+  async function indexFavorites({ search, cursor, limit }: indexInterface = {}) {
+    let queryParams = {} as indexInterface;
+
+    if (search) queryParams.search = search;
+    if (cursor) queryParams.cursor = cursor;
+    if (limit) queryParams.limit = limit;
+
+    return await api.get<Dictionary.IndexWord>('/user/me/favorites', {
+      params: queryParams,
+      headers: {
+        Authorization: String(userServices.getToken())
+      }
+    })
+      .then(response => response.data)
+      .catch(error => {
+        alert.notify(error.response.data.message, 'error');
+        return undefined;
+      });
+  }
   
   async function getWord(word: string) {
     return await api.get<Dictionary.WordData>(`/entries/en/${word}`, {
@@ -86,6 +126,8 @@ export default function useDictionaryOperations() {
 
   return {
     indexWords,
+    indexHistory,
+    indexFavorites,
     getWord,
     favoriteWord,
     unfavoriteWord

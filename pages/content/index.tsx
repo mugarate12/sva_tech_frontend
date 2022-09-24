@@ -30,6 +30,20 @@ const Content: NextPage = () => {
     if (words) setWords(words);
   }
 
+  async function getInitialHistory() {
+    const words = await dictionaryOp.indexFavorites({
+      limit: 12
+    });
+    if (words) setWords(words);
+  }
+  
+  async function getInitialFavorites() {
+    const words = await dictionaryOp.indexHistory({
+      limit: 12
+    });
+    if (words) setWords(words);
+  }
+
   async function handleSelectWord(word: string) {
     const response = await dictionaryOp.getWord(word);
     setWord(response);
@@ -61,6 +75,16 @@ const Content: NextPage = () => {
     getInitialWords();
     handleSelectWord('hello');
   }, []);
+
+  useEffect(() => {
+    if (actualTab === 'word_list') {
+      getInitialWords();
+    } else if (actualTab === 'history') {
+      getInitialHistory();
+    } else {
+      getInitialFavorites();
+    }
+  }, [ actualTab ]);
 
   function renderWords() {
     let wordsHeadquarters: Array<string[]> = [];
