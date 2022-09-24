@@ -89,7 +89,11 @@ const Content: NextPage = () => {
       return (
         <div key={index} className='grid grid-cols-3'>
           {words.map((word, index) => {
-            return <span key={index} className='h-[50px] w-full btn text-center bg-black rounded'>{word}</span>
+            return <span 
+              key={index} 
+              className='h-[50px] w-full btn text-center bg-black rounded'
+              onClick={() => handleSelectWord(word)}
+            >{word}</span>
           })}
         </div>
       )
