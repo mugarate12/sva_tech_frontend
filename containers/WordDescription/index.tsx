@@ -1,11 +1,13 @@
 import { 
   XIcon,
-  HeartIcon
+  HeartIcon,
+  ClipboardIcon
 } from '@heroicons/react/solid';
 import {
   useState,
   useEffect
 } from 'react';
+import { useRouter } from 'next/router';
 
 import {
   Button
@@ -14,6 +16,10 @@ import {
 import {
   Dictionary
 } from './../../interfaces';
+
+import {
+  useUtils
+} from './../../hooks';
 
 interface Props {
   word?: Dictionary.WordData;
@@ -33,6 +39,9 @@ const WordDescription = ({
 
   className
 }: Props) => {
+  const utils = useUtils();
+  const router = useRouter();
+
   const [ wordTitle, setWordTitle ] = useState<string>('');
   const [ phoneticsText, setPhoneticsText ] = useState<string[]>([]);
   const [ audioSource, setAudioSource ] = useState<string>('');
@@ -125,6 +134,14 @@ const WordDescription = ({
       </div>
 
       <div className='w-full flex flex-row justify-end items-center'>
+        <Button 
+          className='btn btn-circle btn-link' 
+          title='Copiar link'
+          onClick={() => wordTitle && wordTitle.length > 0 ? utils.clipToClipboard(`${window.location.href}/${wordTitle}`, 'Link para compartilhar copiado com sucesso!') : null}
+        >
+          <ClipboardIcon className='h-7 w-7 text-black-500'/>
+        </Button>
+        
         <Button 
           className='btn btn-circle btn-link' 
           title='Adicionar favorito'
